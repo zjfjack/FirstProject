@@ -6,7 +6,7 @@
 
 // Sets default values
 ACritter::ACritter() :
-	MeshComponent(CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"))),
+	MeshComponent(CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"))),
 	CameraComponent(CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"))),
 	CurrentVelocity(FVector(0.f))
 {
@@ -37,8 +37,6 @@ void ACritter::Tick(float DeltaTime)
 	
 	FVector NewLocation = GetActorLocation() + CurrentVelocity * DeltaTime;
 	SetActorLocation(NewLocation);
-
-	UE_LOG(LogTemp, Warning, TEXT("NewLocation: %s"), *NewLocation.ToString());
 }
 
 // Called to bind functionality to input
