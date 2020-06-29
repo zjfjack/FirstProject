@@ -31,6 +31,28 @@ AMainCharacter::AMainCharacter() :
 	Movement->AirControl = 0.2f;
 }
 
+void AMainCharacter::SetMovementStatus(EMovementStatus Status)
+{
+	MovementStatus = Status;
+	GetCharacterMovement()->MaxWalkSpeed = Status == EMovementStatus::EMS_Normal ? RunningSpeed : SprintingSpeed;
+}
+
+void AMainCharacter::DecrementHealth(float Amount)
+{
+	Health -= Amount;
+	if (Health <= 0)
+		Die();
+}
+
+void AMainCharacter::IncrementCoins(int32 Amount)
+{
+	Coins += Amount;
+}
+
+void AMainCharacter::Die()
+{
+}
+
 // Called when the game starts or when spawned
 void AMainCharacter::BeginPlay()
 {
@@ -43,6 +65,57 @@ void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	float DeltaStamina = StaminaDrainRate * DeltaTime;
+
+	switch (StaminaStatus)
+	{
+	case EStaminaStatus::ESS_Normal:
+		if (bSprintKeyIsPressed)
+		{
+			Stamina -= DeltaStamina;
+			if (Stamina <= MinSprintStamina)
+				StaminaStatus = EStaminaStatus::ESS_BelowMinimum;
+			SetMovementStatus(EMovementStatus::EMS_Sprinting);
+		}
+		else
+		{
+			Stamina = FMath::Min(Stamina + DeltaStamina, MaxStamina);
+			SetMovementStatus(EMovementStatus::EMS_Normal);
+		}
+		break;
+	case EStaminaStatus::ESS_BelowMinimum:
+		if (bSprintKeyIsPressed)
+		{
+			Stamina = FMath::Max(Stamina - DeltaStamina, 0.f);
+			if (FMath::IsNearlyZero(Stamina))
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_Exhausted);
+				SetMovementStatus(EMovementStatus::EMS_Normal);
+			}
+			else
+				SetMovementStatus(EMovementStatus::EMS_Sprinting);
+		}
+		else
+		{
+			Stamina += DeltaStamina;
+			if (Stamina >= MinSprintStamina)
+				SetStaminaStatus(EStaminaStatus::ESS_Normal);
+			SetMovementStatus(EMovementStatus::EMS_Normal);
+		}
+		break;
+	case EStaminaStatus::ESS_Exhausted:
+		if (!bSprintKeyIsPressed)
+		{
+			Stamina += DeltaStamina;
+			SetStaminaStatus(EStaminaStatus::ESS_ExhaustedRecovering);
+		}
+		break;
+	case EStaminaStatus::ESS_ExhaustedRecovering:
+		Stamina += DeltaStamina;
+		if (Stamina >= MinSprintStamina)
+			SetStaminaStatus(EStaminaStatus::ESS_Normal);
+		break;
+	}
 }
 
 // Called to bind functionality to input
@@ -53,6 +126,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::SprintKeyPressed);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::SprintKeyReleased);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
@@ -97,4 +172,14 @@ void AMainCharacter::TurnAtRate(float Rate)
 void AMainCharacter::LookUpAtRate(float Rate)
 {
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AMainCharacter::SprintKeyPressed()
+{
+	bSprintKeyIsPressed = true;
+}
+
+void AMainCharacter::SprintKeyReleased()
+{
+	bSprintKeyIsPressed = false;
 }
