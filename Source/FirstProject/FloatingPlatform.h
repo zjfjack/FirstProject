@@ -9,38 +9,38 @@
 UCLASS()
 class FIRSTPROJECT_API AFloatingPlatform : public AActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+    
 public:	
-	// Sets default values for this actor's properties
-	AFloatingPlatform();
+    // Sets default values for this actor's properties
+    AFloatingPlatform();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Platform")
-	UStaticMeshComponent* Mesh;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Platform")
+    UStaticMeshComponent* Mesh;
 
-	UPROPERTY(EditAnywhere)
-	FVector StartPoint;
+    UPROPERTY(EditAnywhere)
+    FVector StartPoint;
 
-	UPROPERTY(EditAnywhere, Category = "Platform",  meta = (MakeEditWidget = "true"))
-	FVector EndPoint;
+    UPROPERTY(EditAnywhere, Category = "Platform",  meta = (MakeEditWidget = "true"))
+    FVector EndPoint;
 
-	UPROPERTY(EditAnywhere, Category = "Platform")
-	float InterpSpeed = 4.f;
+    UPROPERTY(EditAnywhere, Category = "Platform")
+    float InterpSpeed = 4.f;
 
-	FTimerHandle InterpTimer;
+    FTimerHandle InterpTimer;
 
-	bool bIsInterping = true;
+    bool bIsInterping = true;
 
-	UPROPERTY(EditAnywhere, Category = "Platform")
-	float InterpTime = 2.f;
+    UPROPERTY(EditAnywhere, Category = "Platform")
+    float InterpTime = 2.f;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	void ToggleIsInterping();
+    void ToggleIsInterping();
 };

@@ -12,23 +12,23 @@
 UCLASS()
 class FIRSTPROJECT_API UMainAnimInstance : public UAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void NativeInitializeAnimation() override;
+    virtual void NativeInitializeAnimation() override;
 
-	UFUNCTION(BlueprintCallable, Category = "AnimationProperties")
-	void UpdateAnimationProperties();
+    UFUNCTION(BlueprintCallable, Category = "AnimationProperties")
+    void UpdateAnimationProperties();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	float MovementSpeed;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	bool bIsInAir;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    float MovementSpeed;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    bool bIsInAir;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	class APawn* Pawn;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    class APawn* Pawn;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
-	class AMainCharacter* MainCharacter;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+    class AMainCharacter* MainCharacter;
 };

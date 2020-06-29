@@ -5,10 +5,10 @@ using System.Collections.Generic;
 
 public class FirstProjectTarget : TargetRules
 {
-	public FirstProjectTarget( TargetInfo Target) : base(Target)
-	{
-		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.AddRange( new string[] { "FirstProject" } );
-	}
+    public FirstProjectTarget( TargetInfo Target) : base(Target)
+    {
+        Type = TargetType.Game;
+        DefaultBuildSettings = BuildSettingsVersion.V2;
+        ExtraModuleNames.AddRange( new string[] { "FirstProject" } );
+    }
 }

@@ -9,36 +9,36 @@
 UCLASS()
 class FIRSTPROJECT_API ACritter : public APawn
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
-	ACritter();
+    // Sets default values for this pawn's properties
+    ACritter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+    // Called to bind functionality to input
+    virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UPROPERTY(EditAnywhere)
-	USkeletalMeshComponent* MeshComponent;
+    UPROPERTY(EditAnywhere)
+    USkeletalMeshComponent* MeshComponent;
 
-	UPROPERTY(EditAnywhere)
-	class UCameraComponent* CameraComponent;
+    UPROPERTY(EditAnywhere)
+    class UCameraComponent* CameraComponent;
 
-	UPROPERTY(EditAnywhere, Category = "Pawn Movement")
-	float MaxSpeed = 100.f;
+    UPROPERTY(EditAnywhere, Category = "Pawn Movement")
+    float MaxSpeed = 100.f;
 
 private:
 
-	void MoveForward(float Value);
-	void MoveRight(float Value);
+    void MoveForward(float Value);
+    void MoveRight(float Value);
 
-	FVector CurrentVelocity;
+    FVector CurrentVelocity;
 };

@@ -9,65 +9,65 @@
 UCLASS()
 class FIRSTPROJECT_API AFloorSwitchActor : public AActor
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+    
 public:	
-	// Sets default values for this actor's properties
-	AFloorSwitchActor();
+    // Sets default values for this actor's properties
+    AFloorSwitchActor();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
-	class UBoxComponent* TriggerBox;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
+    class UBoxComponent* TriggerBox;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
-	UStaticMeshComponent* FloorSwitch;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
+    UStaticMeshComponent* FloorSwitch;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
-	UStaticMeshComponent* Door;
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Floor Switch")
+    UStaticMeshComponent* Door;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Floor Switch")
-	FVector InitialDoorLocation;
+    UPROPERTY(BlueprintReadWrite, Category = "Floor Switch")
+    FVector InitialDoorLocation;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Floor Switch")
-	FVector InitialSwitchLocation;
+    UPROPERTY(BlueprintReadWrite, Category = "Floor Switch")
+    FVector InitialSwitchLocation;
 
-	FTimerHandle SwitchHandle;
+    FTimerHandle SwitchHandle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Floor Switch")
-	float SwitchTime = 2.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Floor Switch")
+    float SwitchTime = 2.f;
 
-	bool bCharacterOnSwitch = false;
+    bool bCharacterOnSwitch = false;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+    UFUNCTION()
+    void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
-	void RaiseDoor();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
+    void RaiseDoor();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
-	void LowerDoor();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
+    void LowerDoor();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
-	void RaiseFloorSwitch();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
+    void RaiseFloorSwitch();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
-	void LowerFloorSwitch();
+    UFUNCTION(BlueprintImplementableEvent, Category = "Floor Switch")
+    void LowerFloorSwitch();
 
-	UFUNCTION(BlueprintCallable, Category = "Floor Switch")
-	void UpdateDoorLocation(float Z);
+    UFUNCTION(BlueprintCallable, Category = "Floor Switch")
+    void UpdateDoorLocation(float Z);
 
-	UFUNCTION(BlueprintCallable, Category = "Floor Switch")
-	void UpdateFloorSwitch(float Z);
+    UFUNCTION(BlueprintCallable, Category = "Floor Switch")
+    void UpdateFloorSwitch(float Z);
 
-	void CloseDoor();
+    void CloseDoor();
 };
