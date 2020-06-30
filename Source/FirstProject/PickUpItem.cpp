@@ -16,7 +16,11 @@ void APickUpItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
     if (OtherActor)
     {
         if (auto Character = Cast<AMainCharacter>(OtherActor))
+        {
             Character->IncrementCoins(CoinCount);
+            Character->PickUpLocations.Add(GetActorLocation());
+            Destroy();
+        }
     }
 }
 

@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Weapon.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter() :
@@ -29,6 +31,12 @@ AMainCharacter::AMainCharacter() :
 	Movement->RotationRate = FRotator(0.f, 540.f, 0.f); // at this rotation rate
 	Movement->JumpZVelocity = 650.f;
 	Movement->AirControl = 0.2f;
+}
+
+void AMainCharacter::ShowPickUpLocations()
+{
+	for (auto PickUpLocation : PickUpLocations)
+		UKismetSystemLibrary::DrawDebugSphere(this, PickUpLocation, 25.f, 12, FLinearColor::Red, 5.f, 2.f);
 }
 
 void AMainCharacter::SetMovementStatus(EMovementStatus Status)
@@ -57,7 +65,6 @@ void AMainCharacter::Die()
 void AMainCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -128,6 +135,8 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AMainCharacter::SprintKeyPressed);
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AMainCharacter::SprintKeyReleased);
+	PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMainCharacter::LMBPressed);
+	PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMainCharacter::LMBReleased);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
@@ -174,6 +183,25 @@ void AMainCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMainCharacter::LMBPressed()
+{
+	bLMBPressed = true;
+
+	if (ActiveOverlappingItem)
+	{
+		if (auto Weapon = Cast<AWeapon>(ActiveOverlappingItem))
+		{
+			Weapon->Equip(this);
+			SetActiveOverlappingItem(nullptr);
+		}
+	}
+}
+
+void AMainCharacter::LMBReleased()
+{
+	bLMBPressed = false;
+}
+
 void AMainCharacter::SprintKeyPressed()
 {
 	bSprintKeyIsPressed = true;
@@ -182,4 +210,11 @@ void AMainCharacter::SprintKeyPressed()
 void AMainCharacter::SprintKeyReleased()
 {
 	bSprintKeyIsPressed = false;
+}
+
+void AMainCharacter::SetEquippedWeapon(AWeapon* Weapon)
+{
+	if (EquippedWeapon)
+		EquippedWeapon->Destroy();
+	EquippedWeapon = Weapon;
 }

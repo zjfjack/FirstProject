@@ -31,6 +31,14 @@ public:
     // Sets default values for this character's properties
     AMainCharacter();
 
+    TArray<FVector> PickUpLocations;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+    class AWeapon* EquippedWeapon = nullptr;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
+    class AItem* ActiveOverlappingItem = nullptr;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
     class USpringArmComponent* CameraBoom;
 
@@ -105,9 +113,20 @@ public:
     void TurnAtRate(float Rate);
     void LookUpAtRate(float Rate);
 
+    bool bLMBPressed = false;
+    void LMBPressed();
+    void LMBReleased();
+
     void SprintKeyPressed();
     void SprintKeyReleased();
 
     FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
     FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+    void SetEquippedWeapon(AWeapon* Weapon);
+    FORCEINLINE AWeapon* GetEquippedWeapon() { return EquippedWeapon; }
+    FORCEINLINE void SetActiveOverlappingItem(AItem* Item) { ActiveOverlappingItem = Item; }
+
+    UFUNCTION(BlueprintCallable)
+    void ShowPickUpLocations();
 };

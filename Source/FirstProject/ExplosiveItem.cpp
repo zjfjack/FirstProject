@@ -16,7 +16,10 @@ void AExplosiveItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
     if (OtherActor)
     {
         if (auto Character = Cast<AMainCharacter>(OtherActor))
+        {
             Character->DecrementHealth(Damage);
+            Destroy();
+        }
     }
 }
 
