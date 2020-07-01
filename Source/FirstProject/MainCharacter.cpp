@@ -149,7 +149,7 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void AMainCharacter::MoveForward(float Value)
 {
-	if (Controller != nullptr && Value != 0.f)
+	if (Controller != nullptr && Value != 0.f && !bAttacking)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -162,7 +162,7 @@ void AMainCharacter::MoveForward(float Value)
 
 void AMainCharacter::MoveRight(float Value)
 {
-	if (Controller != nullptr && Value != 0.f)
+	if (Controller != nullptr && Value != 0.f && !bAttacking)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -186,7 +186,6 @@ void AMainCharacter::LookUpAtRate(float Rate)
 void AMainCharacter::LMBPressed()
 {
 	bLMBPressed = true;
-
 	if (ActiveOverlappingItem)
 	{
 		if (auto Weapon = Cast<AWeapon>(ActiveOverlappingItem))
@@ -195,6 +194,8 @@ void AMainCharacter::LMBPressed()
 			SetActiveOverlappingItem(nullptr);
 		}
 	}
+	else if (GetEquippedWeapon())
+		Attack();
 }
 
 void AMainCharacter::LMBReleased()
@@ -217,4 +218,26 @@ void AMainCharacter::SetEquippedWeapon(AWeapon* Weapon)
 	if (EquippedWeapon)
 		EquippedWeapon->Destroy();
 	EquippedWeapon = Weapon;
+}
+
+void AMainCharacter::Attack()
+{
+	if (bAttacking) return;
+
+	bAttacking = true;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && CombatMontage)
+	{
+		int32 Section = FMath::RandRange(0, 1);
+		AnimInstance->Montage_Play(CombatMontage, 2.f);
+		FName SectionName = Section == 0 ? "Attack_1" : "Attack_2";
+		AnimInstance->Montage_JumpToSection(SectionName, CombatMontage);
+	}
+}
+
+void AMainCharacter::AttackEnd()
+{
+	bAttacking = false;
+	if (bLMBPressed)
+		Attack();		
 }

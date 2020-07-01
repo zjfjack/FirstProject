@@ -45,6 +45,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
     class UCameraComponent* FollowCamera;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
+    class UAnimMontage* CombatMontage;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     float BaseTurnRate = 65.f;
 
@@ -87,14 +90,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats")
     int32 Coins = 0;
 
-    void SetMovementStatus(EMovementStatus Status);
-    FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player Stats")
+    bool bAttacking;
 
-    void DecrementHealth(float Amount);
-
-    void IncrementCoins(int32 Amount);
-
-    void Die();
+    bool bLMBPressed = false;
 
 protected:
     // Called when the game starts or when spawned
@@ -113,7 +112,6 @@ public:
     void TurnAtRate(float Rate);
     void LookUpAtRate(float Rate);
 
-    bool bLMBPressed = false;
     void LMBPressed();
     void LMBReleased();
 
@@ -129,4 +127,15 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void ShowPickUpLocations();
+
+    void Attack();
+    UFUNCTION(BlueprintCallable)
+    void AttackEnd();
+
+    void SetMovementStatus(EMovementStatus Status);
+    FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
+
+    void DecrementHealth(float Amount);
+    void IncrementCoins(int32 Amount);
+    void Die();
 };
