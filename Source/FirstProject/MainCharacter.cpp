@@ -8,6 +8,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Weapon.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter() :
@@ -59,6 +62,12 @@ void AMainCharacter::IncrementCoins(int32 Amount)
 
 void AMainCharacter::Die()
 {
+}
+
+void AMainCharacter::PlaySwingSound()
+{
+	if (auto SwingSound = EquippedWeapon->SwingSound)
+		UGameplayStatics::PlaySound2D(this, SwingSound);
 }
 
 // Called when the game starts or when spawned

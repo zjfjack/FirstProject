@@ -56,6 +56,12 @@ public:
 
     bool bSprintKeyIsPressed = false;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+    class UParticleSystem* HitParticles = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+    class USoundCue* HitSound = nullptr;
+
     /**
     /* Player Stats
     */
@@ -138,4 +144,7 @@ public:
     void DecrementHealth(float Amount);
     void IncrementCoins(int32 Amount);
     void Die();
+
+    UFUNCTION(BlueprintCallable)
+    void PlaySwingSound();
 };
