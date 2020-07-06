@@ -32,19 +32,27 @@ public:
 	bool bWeaponParticle = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Sound")
-	class USoundCue* OnEquipSound;
+	class USoundCue* OnEquipSound = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "SkeletalMesh")
-	class USkeletalMeshComponent* SkeletalMesh;
+	class USkeletalMeshComponent* SkeletalMesh = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item | Combat")
-	class UBoxComponent* CombatCollision;
+	class UBoxComponent* CombatCollision = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Combat")
 	float Damage = 25.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Sound")
-	USoundCue* SwingSound;
+	USoundCue* SwingSound = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item | Combat")
+	TSubclassOf<UDamageType> DamageTypeClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item | Combat")
+	AController* WeaponInstigator = nullptr;
+
+	FORCEINLINE void SetWeaponInstigator(AController* Inst) { WeaponInstigator = Inst; }
 
 protected:
 

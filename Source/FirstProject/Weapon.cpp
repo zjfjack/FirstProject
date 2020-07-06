@@ -62,6 +62,8 @@ void AWeapon::Equip(AMainCharacter* Character)
         //SkeletalMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
         //SkeletalMesh->SetSimulatePhysics(false);
 
+        SetWeaponInstigator(Character->GetController());
+
         const USkeletalMeshSocket* RightHandSocket = Character->GetMesh()->GetSocketByName("RightHandSocket");
         if (RightHandSocket)
         {
@@ -95,6 +97,8 @@ void AWeapon::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAc
             }
             if (auto HitSound = Enemy->HitSound)
                 UGameplayStatics::PlaySound2D(this, HitSound);
+            if (DamageTypeClass && WeaponInstigator)
+                UGameplayStatics::ApplyDamage(Enemy, Damage, WeaponInstigator, this, DamageTypeClass);
         }
     }
 }

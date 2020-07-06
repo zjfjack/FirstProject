@@ -11,7 +11,8 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Animation/AnimInstance.h"
-
+#include "Components/CapsuleComponent.h"
+#include "MainPlayerController.h"
 
 // Sets default values
 AEnemy::AEnemy() :
@@ -66,7 +67,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		if (auto Character = Cast<AMainCharacter>(OtherActor))
 		{
@@ -81,6 +82,12 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 	{
 		if (auto Character = Cast<AMainCharacter>(OtherActor))
 		{
+			if (Character->CombatTarget == this)
+				Character->SetCombatTarget(nullptr);
+			if (auto MainPlayerController = Character->MainPlayerController)
+			{
+				MainPlayerController->HideEnemyHealthBar();
+			}
 			SetMovementStatus(EEnemyMovementStatus::EMS_Idle);
 			if (AIController)
 			{
@@ -93,10 +100,15 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
 {
 	
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		if (auto Character = Cast<AMainCharacter>(OtherActor))
 		{
+			Character->SetCombatTarget(this);
+			if (auto MainPlayerController = Character->MainPlayerController)
+			{
+				MainPlayerController->DisplayEnemyHealthBar();
+			}
 			CombatTarget = Character;
 			bOverlappingCombatSphere = true;
 			Attack();
@@ -106,7 +118,7 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent* OverlappedComponent
 
 void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
 {
-	if (OtherActor)
+	if (OtherActor && Alive())
 	{
 		if (auto Character = Cast<AMainCharacter>(OtherActor))
 		{
@@ -116,6 +128,7 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent* OverlappedComponent, 
 				MoveToTarget(Character);
 				CombatTarget = nullptr;
 			}
+			GetWorldTimerManager().ClearTimer(AttackTimer);
 		}
 	}
 }
@@ -137,6 +150,9 @@ void AEnemy::CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 			}
 			if (auto CharacterHitSound = Character->HitSound)
 				UGameplayStatics::PlaySound2D(this, CharacterHitSound);
+
+			if (DamageTypeClass)
+				UGameplayStatics::ApplyDamage(Character, Damage, AIController, this, DamageTypeClass);
 		}
 	}
 }
@@ -160,6 +176,7 @@ void AEnemy::DeactivateCollision()
 
 void AEnemy::Attack()
 {
+	if (!Alive()) return;
 	if (AIController)
 	{
 		AIController->StopMovement();
@@ -182,12 +199,47 @@ void AEnemy::AttackEnd()
 	bAttacking = false;
 	if (bOverlappingCombatSphere)
 	{
-		Attack();
+		float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
+		GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 	}
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Health -= DamageAmount;
+	if (Health <= 0.f)
+		Die();
+	return DamageAmount;
+}
+
+void AEnemy::Die()
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(CombatMontage);
+		AnimInstance->Montage_JumpToSection("Death", CombatMontage);
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Die"));
+	SetMovementStatus(EEnemyMovementStatus::EMS_Dead);
+	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CombatSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AIController->StopMovement();
+}
+
+void AEnemy::DeathEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Death End"));
+	GetMesh()->bPauseAnims = true;
+	GetMesh()->bNoSkeletonUpdate = true;
+
+	GetWorldTimerManager().SetTimer(DeathTimer, this, &AEnemy::Disappear, DeathDelay);
 }
 
 void AEnemy::MoveToTarget(AMainCharacter* Target)
 {
+	UE_LOG(LogTemp, Warning, TEXT("MoveToTarget"));
 	SetMovementStatus(EEnemyMovementStatus::EMS_MoveToTarget);
 	if (AIController)
 	{
@@ -204,4 +256,14 @@ void AEnemy::MoveToTarget(AMainCharacter* Target)
 
 		//AIController->MoveToActor(Target);
 	}
+}
+
+bool AEnemy::Alive()
+{
+	return MovementStatus != EEnemyMovementStatus::EMS_Dead;
+}
+
+void AEnemy::Disappear()
+{
+	Destroy();
 }

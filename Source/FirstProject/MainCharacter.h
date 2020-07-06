@@ -10,7 +10,8 @@ UENUM(BlueprintType)
 enum class EMovementStatus : uint8
 {
     EMS_Normal UMETA(DisplayName = "Normal"),
-    EMS_Sprinting UMETA(DisplayName = "Sprinting")
+    EMS_Sprinting UMETA(DisplayName = "Sprinting"),
+    EMS_Dead UMETA(DisplayName = "Dead")
 };
 
 UENUM(BlueprintType)
@@ -31,6 +32,9 @@ public:
     // Sets default values for this character's properties
     AMainCharacter();
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Controller")
+    class AMainPlayerController* MainPlayerController = nullptr;
+
     TArray<FVector> PickUpLocations;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item")
@@ -40,13 +44,13 @@ public:
     class AItem* ActiveOverlappingItem = nullptr;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    class USpringArmComponent* CameraBoom;
+    class USpringArmComponent* CameraBoom = nullptr;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-    class UCameraComponent* FollowCamera;
+    class UCameraComponent* FollowCamera = nullptr;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Anims")
-    class UAnimMontage* CombatMontage;
+    class UAnimMontage* CombatMontage = nullptr;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     float BaseTurnRate = 65.f;
@@ -93,6 +97,15 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats")
     float MinSprintStamina = 70.f;
 
+    float InterpSpeed = 15.f;
+    float bInterpToEnemy = false;
+    void SetInterpToEnemy(bool Interp);
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+    class AEnemy* CombatTarget = nullptr;
+
+    FORCEINLINE void SetCombatTarget(AEnemy* Enemy) { CombatTarget = Enemy; }
+
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Player Stats")
     int32 Coins = 0;
 
@@ -111,6 +124,8 @@ public:
 
     // Called to bind functionality to input
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+    virtual void Jump() override;
 
     void MoveForward(float Value);
     void MoveRight(float Value);
@@ -142,9 +157,21 @@ public:
     FORCEINLINE void SetStaminaStatus(EStaminaStatus Status) { StaminaStatus = Status; }
 
     void DecrementHealth(float Amount);
+
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
     void IncrementCoins(int32 Amount);
     void Die();
 
     UFUNCTION(BlueprintCallable)
     void PlaySwingSound();
+
+    UFUNCTION(BlueprintCallable)
+    void DeathEnd();
+
+private:
+    void TickMovementStatus(float DeltaTime);
+    void TickInterpingToEnemy(float DeltaTime);
+    void TickUpdatingPlayerController();
+    FRotator GetLookAtRotationYaw(FVector Target);
 };
