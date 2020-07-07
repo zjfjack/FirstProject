@@ -12,7 +12,7 @@
 UCLASS()
 class FIRSTPROJECT_API UEnemyAnimInstance : public UAnimInstance
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
 

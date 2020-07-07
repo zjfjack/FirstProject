@@ -3,6 +3,8 @@
 
 #include "ExplosiveItem.h"
 #include "MainCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 AExplosiveItem::AExplosiveItem()
 {
@@ -17,6 +19,11 @@ void AExplosiveItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
     {
         if (auto Character = Cast<AMainCharacter>(OtherActor))
         {
+            if (OverlapParticles)
+                UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), OverlapParticles, GetActorLocation(), FRotator(0.f));
+            if (OverlapSound)
+                UGameplayStatics::PlaySound2D(this, OverlapSound);
+
             Character->DecrementHealth(Damage);
             Destroy();
         }

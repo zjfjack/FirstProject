@@ -174,4 +174,8 @@ private:
     void TickInterpingToEnemy(float DeltaTime);
     void TickUpdatingPlayerController();
     FRotator GetLookAtRotationYaw(FVector Target);
+
+    bool bMovingForward = false;
+    bool bMovingRight = false;
+    bool IsMoving();
 };
