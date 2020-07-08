@@ -78,6 +78,11 @@ void AMainCharacter::IncrementCoins(int32 Amount)
     Coins += Amount;
 }
 
+void AMainCharacter::IncrementHealth(float Amount)
+{
+    Health = FMath::Min(MaxHealth, Health + Amount);
+}
+
 void AMainCharacter::Die()
 {
     if (MovementStatus == EMovementStatus::EMS_Dead) return;
@@ -344,4 +349,34 @@ void AMainCharacter::AttackEnd()
     SetInterpToEnemy(false);
     if (bLMBPressed)
         Attack();		
+}
+
+void AMainCharacter::UpdateCombatTarget()
+{
+    TSet<AActor*> OverlappingActors;
+    GetOverlappingActors(OverlappingActors, EnemyFilter);
+
+    if (OverlappingActors.Num() == 0)
+    {
+        if (MainPlayerController)
+            MainPlayerController->HideEnemyHealthBar();
+        return;
+    }
+    FVector CharacterLocation = GetActorLocation();
+    float MinDistance = TNumericLimits<float>::Max();
+    AActor* closestEnemy = nullptr;
+    for (auto Actor : OverlappingActors)
+    {
+        float DistanceToActor = (Actor->GetActorLocation() - CharacterLocation).Size();
+        if (DistanceToActor < MinDistance)
+        {
+            MinDistance = DistanceToActor;
+            closestEnemy = Actor;
+        }
+    }
+    SetCombatTarget(Cast<AEnemy>(closestEnemy));
+    if (MainPlayerController)
+    {
+        MainPlayerController->DisplayEnemyHealthBar();
+    }
 }
