@@ -58,9 +58,9 @@ void AWeapon::Equip(AMainCharacter* Character)
 {
     if (Character)
     {
-        //SkeletalMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-        //SkeletalMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-        //SkeletalMesh->SetSimulatePhysics(false);
+        SkeletalMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+        SkeletalMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+        SkeletalMesh->SetSimulatePhysics(false);
 
         SetWeaponInstigator(Character->GetController());
 

@@ -397,7 +397,9 @@ void AMainCharacter::SwitchLevel(FName LevelName)
 void AMainCharacter::SaveGame()
 {
     auto SaveGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
-    SaveGameInstance->CharacterStats = FCharacterStats(Health, MaxHealth, Stamina, MaxStamina, Coins, GetActorLocation(), GetActorRotation());
+    FString WeaponName = "";
+    if (EquippedWeapon) WeaponName = EquippedWeapon->Name;
+    SaveGameInstance->CharacterStats = FCharacterStats(Health, MaxHealth, Stamina, MaxStamina, Coins, GetActorLocation(), GetActorRotation(), WeaponName);
     UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
 }
 
@@ -411,6 +413,7 @@ void AMainCharacter::LoadGame(bool bSetPosition)
     Stamina = LoadGameInstance->CharacterStats.Stamina;
     MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
     Coins = LoadGameInstance->CharacterStats.Coins;
+    LoadWeapon(LoadGameInstance->CharacterStats.WeaponName);
 
     if (bSetPosition)
     {

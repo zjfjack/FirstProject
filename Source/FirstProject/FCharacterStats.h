@@ -14,7 +14,7 @@ struct FCharacterStats
     GENERATED_BODY()
 
     FCharacterStats() = default;
-    FCharacterStats(float Health, float MaxHealth, float Stamina, float MaxStamina, int32 Coins, FVector Location, FRotator Rotation);
+    FCharacterStats(float Health, float MaxHealth, float Stamina, float MaxStamina, int32 Coins, FVector Location, FRotator Rotation, FString WeaponName);
 
     UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
     float Health;
@@ -36,4 +36,7 @@ struct FCharacterStats
 
     UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
     FRotator Rotation;
+
+    UPROPERTY(VisibleAnywhere, Category = "SaveGameData")
+    FString WeaponName;
 };

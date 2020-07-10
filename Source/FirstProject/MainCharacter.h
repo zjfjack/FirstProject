@@ -186,6 +186,9 @@ public:
     UFUNCTION(BlueprintCallable)
     void LoadGame(bool bSetPosition);
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void LoadWeapon(const FString& WeaponName);
+
 private:
     void TickMovementStatus(float DeltaTime);
     void TickInterpingToEnemy(float DeltaTime);
