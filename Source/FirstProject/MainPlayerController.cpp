@@ -8,21 +8,31 @@ void AMainPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (HUDOverlayAsset)
-        HUDOverlay = CreateWidget<UUserWidget>(this, HUDOverlayAsset);
+    if (WHUDOverlay)
+        HUDOverlay = CreateWidget<UUserWidget>(this, WHUDOverlay);
     HUDOverlay->AddToViewport();
     HUDOverlay->SetVisibility(ESlateVisibility::Visible);
 
-    if (EnemyHealthBarAsset)
+    if (WEnemyHealthBar)
     {
-        EnemyHealthBar = CreateWidget<UUserWidget>(this, EnemyHealthBarAsset);
+        EnemyHealthBar = CreateWidget<UUserWidget>(this, WEnemyHealthBar);
         if (EnemyHealthBar)
         {
             EnemyHealthBar->AddToViewport();
             EnemyHealthBar->SetVisibility(ESlateVisibility::Hidden);
         }
         EnemyHealthBar->SetAlignmentInViewport(FVector2D::ZeroVector);
-    }    
+    }
+
+    if (WPauseMenu)
+    {
+        PauseMenu = CreateWidget<UUserWidget>(this, WPauseMenu);
+        if (PauseMenu)
+        {
+            PauseMenu->AddToViewport();
+            PauseMenu->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
 }
 
 void AMainPlayerController::Tick(float DeltaTime)
@@ -41,6 +51,34 @@ void AMainPlayerController::Tick(float DeltaTime)
     }
 }
 
+void AMainPlayerController::DisplayPauseMenu_Implementation()
+{
+    if (PauseMenu)
+    {
+        bPauseMenuVisible = true;
+        PauseMenu->SetVisibility(ESlateVisibility::Visible);
+        FInputModeGameAndUI InputModeGameAndUI;
+        SetInputMode(InputModeGameAndUI);
+        bShowMouseCursor = true;
+    }
+}
+
+void AMainPlayerController::HidePauseMenu_Implementation()
+{
+    if (PauseMenu)
+    {
+        FInputModeGameOnly InputModeGameOnly;
+        SetInputMode(InputModeGameOnly);
+        bShowMouseCursor = false;
+        bPauseMenuVisible = false;
+    }
+}
+
+void AMainPlayerController::TogglePauseMenu()
+{
+    bPauseMenuVisible ? HidePauseMenu() : DisplayPauseMenu();
+}
+
 void AMainPlayerController::DisplayEnemyHealthBar()
 {
     if (EnemyHealthBar)
@@ -54,7 +92,6 @@ void AMainPlayerController::HideEnemyHealthBar()
 {
     if (EnemyHealthBar)
     {
-        UE_LOG(LogTemp, Warning, TEXT("HideEnemyHealthBar"));
         bEnenmyHealthBarVisible = false;
         EnemyHealthBar->SetVisibility(ESlateVisibility::Hidden);
     }

@@ -113,6 +113,7 @@ public:
     bool bAttacking;
 
     bool bLMBPressed = false;
+    bool bESCPressed = false;
 
 protected:
     // Called when the game starts or when spawned
@@ -135,6 +136,9 @@ public:
 
     void LMBPressed();
     void LMBReleased();
+
+    void ESCPressed();
+    void ESCReleased();
 
     void SprintKeyPressed();
     void SprintKeyReleased();

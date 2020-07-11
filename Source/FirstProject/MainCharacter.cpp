@@ -231,6 +231,9 @@ void AMainCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
     PlayerInputComponent->BindAction("LMB", IE_Pressed, this, &AMainCharacter::LMBPressed);
     PlayerInputComponent->BindAction("LMB", IE_Released, this, &AMainCharacter::LMBReleased);
 
+    PlayerInputComponent->BindAction("ESC", IE_Pressed, this, &AMainCharacter::ESCPressed).bExecuteWhenPaused = true;
+    PlayerInputComponent->BindAction("ESC", IE_Released, this, &AMainCharacter::ESCReleased).bExecuteWhenPaused = true;
+
     PlayerInputComponent->BindAxis("MoveForward", this, &AMainCharacter::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &AMainCharacter::MoveRight);
 
@@ -309,6 +312,22 @@ void AMainCharacter::LMBPressed()
 void AMainCharacter::LMBReleased()
 {
     bLMBPressed = false;
+}
+
+void AMainCharacter::ESCPressed()
+{
+    bESCPressed = true;
+    if (MainPlayerController)
+    {
+        MainPlayerController->TogglePauseMenu();
+        //UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
+        MainPlayerController->SetPause(!MainPlayerController->IsPaused());
+    }
+}
+
+void AMainCharacter::ESCReleased()
+{
+    bESCPressed = false;
 }
 
 void AMainCharacter::SprintKeyPressed()

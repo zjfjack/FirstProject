@@ -18,17 +18,30 @@ public:
 
     /** Reference to the UMG asset in the editor */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-    TSubclassOf<class UUserWidget> HUDOverlayAsset;
+    TSubclassOf<class UUserWidget> WHUDOverlay;
     
     /** Variable to hold the widget after creating it*/
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
     UUserWidget* HUDOverlay = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-    TSubclassOf<UUserWidget> EnemyHealthBarAsset;
+    TSubclassOf<UUserWidget> WEnemyHealthBar;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
     UUserWidget* EnemyHealthBar = nullptr;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+    TSubclassOf<UUserWidget> WPauseMenu;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
+    UUserWidget* PauseMenu = nullptr;
+
+    bool bPauseMenuVisible = false;
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
+    void DisplayPauseMenu();
+    UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
+    void HidePauseMenu();
+    void TogglePauseMenu();
 
     bool bEnenmyHealthBarVisible = false;
     void DisplayEnemyHealthBar();
