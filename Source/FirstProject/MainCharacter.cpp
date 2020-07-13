@@ -119,7 +119,10 @@ void AMainCharacter::BeginPlay()
     Super::BeginPlay();
 
     MainPlayerController = Cast<AMainPlayerController>(GetController());
-    LoadGameNoSwitch();
+    FString MapName = GetWorld()->GetMapName();
+    MapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+    if (MapName != "SunTemple")
+        LoadGameNoSwitch();
 }
 
 // Called every frame
@@ -407,7 +410,9 @@ void AMainCharacter::SwitchLevel(FName LevelName)
     UWorld* World = GetWorld();
     if (World)
     {
-        if (*World->GetMapName() != LevelName)
+        FString MapName = World->GetMapName();
+        MapName.RemoveFromStart(World->StreamingLevelsPrefix);
+        if (*MapName != LevelName)
         {
             UGameplayStatics::OpenLevel(World, LevelName);
         }
