@@ -137,6 +137,7 @@ public:
     void LMBPressed();
     void LMBReleased();
 
+    UFUNCTION(BlueprintCallable)
     void ESCPressed();
     void ESCReleased();
 
@@ -189,6 +190,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void LoadGame(bool bSetPosition);
+
+    UFUNCTION(BlueprintCallable)
+    void LoadGameNoSwitch();
 
     UFUNCTION(BlueprintImplementableEvent)
     void LoadWeapon(const FString& WeaponName);

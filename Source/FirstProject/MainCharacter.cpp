@@ -119,6 +119,7 @@ void AMainCharacter::BeginPlay()
     Super::BeginPlay();
 
     MainPlayerController = Cast<AMainPlayerController>(GetController());
+    LoadGameNoSwitch();
 }
 
 // Called every frame
@@ -418,12 +419,21 @@ void AMainCharacter::SaveGame()
     auto SaveGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
     FString WeaponName = "";
     if (EquippedWeapon) WeaponName = EquippedWeapon->Name;
-    SaveGameInstance->CharacterStats = FCharacterStats(Health, MaxHealth, Stamina, MaxStamina, Coins, GetActorLocation(), GetActorRotation(), WeaponName);
+    FString MapName = GetWorld()->GetMapName();
+    MapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+    SaveGameInstance->CharacterStats = FCharacterStats(Health, MaxHealth, Stamina, MaxStamina, Coins, GetActorLocation(), GetActorRotation(), WeaponName, MapName);
     UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
 }
 
 void AMainCharacter::LoadGame(bool bSetPosition)
 {
+    if (MovementStatus == EMovementStatus::EMS_Dead)
+    {
+        GetMesh()->bPauseAnims = false;
+        GetMesh()->bNoSkeletonUpdate = false;
+        SetMovementStatus(EMovementStatus::EMS_Normal);
+    }
+
     auto LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass()));
     LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
 
@@ -434,9 +444,27 @@ void AMainCharacter::LoadGame(bool bSetPosition)
     Coins = LoadGameInstance->CharacterStats.Coins;
     LoadWeapon(LoadGameInstance->CharacterStats.WeaponName);
 
+    if (LoadGameInstance->CharacterStats.LevelName != "")
+        SwitchLevel(*LoadGameInstance->CharacterStats.LevelName);
+
     if (bSetPosition)
     {
         SetActorLocation(LoadGameInstance->CharacterStats.Location);
         SetActorRotation(LoadGameInstance->CharacterStats.Rotation);
+    }
+}
+
+void AMainCharacter::LoadGameNoSwitch()
+{
+    if (auto LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::CreateSaveGameObject(UFirstSaveGame::StaticClass())))
+    {
+        LoadGameInstance = Cast<UFirstSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+        if (LoadGameInstance == nullptr) return;
+        Health = LoadGameInstance->CharacterStats.Health;
+        MaxHealth = LoadGameInstance->CharacterStats.MaxHealth;
+        Stamina = LoadGameInstance->CharacterStats.Stamina;
+        MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
+        Coins = LoadGameInstance->CharacterStats.Coins;
+        LoadWeapon(LoadGameInstance->CharacterStats.WeaponName);
     }
 }
